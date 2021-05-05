@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JapFood</title>
+    <link rel="stylesheet" href="/public/CSS/main.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Play:wght@700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    
+    <header>
+        <a href="/">
+            <div class="UpHat">
+                <img src="/public/Img/Logo.png" width="90" height="80" id="LogoPng">
+                <div id="LogoTitle">Jap<span>Food</span></div>
+            </div>
+        </a>
+
+        <nav class="MainNav">
+            <a class="NavItem" href="/">Заказы</a>
+            <a class="NavItem" href="/create">Оформить заказ</a>
+        </nav>
+    </header>
+
+    <section>
+        <h1>Редактирование заказа</h1>
+        <form action="/edit" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="<%=order.o_id %>"/><br><br>
+            <label>Дата:</label><br>
+            <input type="date" name="date" value="<%=order.o_date %>"/><br><br>
+            <label>Клиент:</label><br>
+            <input type="text" name="client" value="<%=order.o_client %>"/><br><br>
+            <label>Статус:</label><br>
+            <select name="status">
+                <option value="Принят">Принят</option>
+                <option value="Приготовлен">Приготовлен</option>
+                <option value="Доставлен">Доставлен</option>
+            </select><br><br>
+            <label>Сумма</label><br>
+            <input type="number" name="sum" value="<%=order.o_sum %>" min="0" max="100001" /><br><br>
+            <label>Файл-описание:</label><br>
+            <input type="file" name="filedata" /><br><br>
+            <input type="submit" value="Редактировать" />
+        </form>
+    </section>
+
+    <footer>
+        <div class="CreateInfo">Created by Yaroslav</div>
+    </footer>
+    
+</body>
+</html>

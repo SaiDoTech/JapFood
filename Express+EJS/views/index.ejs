@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JapFood</title>
+    <link rel="stylesheet" href="/public/CSS/main.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Play:wght@700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    
+    <header>
+        <a href="/">
+            <div class="UpHat">
+                <img src="/public/Img/Logo.png" width="90" height="80" id="LogoPng">
+                <div id="LogoTitle">Jap<span>Food</span></div>
+            </div>
+        </a>
+
+        <nav class="MainNav">
+            <a class="NavItem" href="/" id=ActivePage>Заказы</a>
+            <a class="NavItem" href="/create">Оформить заказ</a>
+        </nav>
+    </header>
+
+    <section>
+        <table class="table table-condensed table-striped table-bordered" id="orderTable">
+            <tr>
+                <th onclick="sortTable(0)" style="cursor:pointer">Номер</th>
+                <th onclick="sortTable(1)" style="cursor:pointer">Дата заказа</th>
+                <th onclick="sortTable(2)" style="cursor:pointer">Клиент</th>
+                <th onclick="sortTable(3)" style="cursor:pointer">Статус</th>
+                <th onclick="sortTable(4)" style="cursor:pointer">Сумма</th>
+                <th>Описание</th>
+                <th></th>
+            </tr>
+
+            <% for(var i=0; i<orders.length;i++) {%>
+                <tr>
+                    <td><%=orders[i].o_id %></td>
+                    <td><%=orders[i].o_date.toLocaleDateString() %></td>
+                    <td><%=orders[i].o_client %></td>
+                    <td><%=orders[i].o_status %></td>
+                    <td><%=orders[i].o_sum %></td>
+                    <% if (orders[i].o_file) { %>
+                        <td><a href="<%=orders[i].o_file %>" download="file.txt">Save file</a></td>
+                    <% } else { %>
+                        <td></td>
+                    <% } %>
+                    <td>
+                        <a href="/edit/<%=orders[i].o_id %>">Edit</a>|
+                        <form action="delete/<%=orders[i].o_id %>" method="POST" style="display:inline;">
+                            <input type="submit" value="Delete" />
+                        </form>
+                    </td>
+                </tr>
+            <%} %>
+
+        </table>
+
+        <script>
+
+            function sortTable(n)
+                {
+                    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+                    table = document.getElementById("orderTable");
+                    switching = true;
+                    // Set the sorting direction to ascending:
+                    dir = "asc";
+                    /* Make a loop that will continue until
+                    no switching has been done: */
+                    while (switching) {
+                        // Start by saying: no switching is done:
+                        switching = false;
+                        rows = table.getElementsByTagName("TR");
+                        /* Loop through all table rows (except the
+                        first, which contains table headers): */
+                        for (i = 1; i < (rows.length - 1); i++) {
+                        // Start by saying there should be no switching:
+                        shouldSwitch = false;
+                        /* Get the two elements you want to compare,
+                        one from current row and one from the next: */
+                        x = rows[i].getElementsByTagName("TD")[n];
+                        y = rows[i + 1].getElementsByTagName("TD")[n];    
+                        /* Check if the two rows should switch place,
+                        based on the direction, asc or desc: */
+                        if (dir == "asc") 
+                        {
+                                if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                                // If so, mark as a switch and break the loop:
+                                shouldSwitch = true;
+                            }
+                        }
+                        else if (dir == "desc") 
+                        {
+
+                            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            // If so, mark as a switch and break the loop:
+                            shouldSwitch = true;
+                            }   
+                        }
+                        if (shouldSwitch) {
+                        /* If a switch has been marked, make the switch
+                        and mark that a switch has been done: */
+                        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                        switching = true;
+                        // Each time a switch is done, increase this count by 1:
+                        switchcount ++;
+                        } else {
+                            if (switchcount == 0 && dir == "asc") {
+                                dir = "desc";
+                                switching = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            </script>
+    </section>
+
+    <footer>
+        <div class="CreateInfo">Created by Yaroslav</div>
+    </footer>
+    
+
+</body>
+</html>
