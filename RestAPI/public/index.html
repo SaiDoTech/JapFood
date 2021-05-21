@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JapFood</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="CSS/main.css">
+</head>
+<body>
+    
+    <header>
+        <a>
+            <div class="UpHat">
+                <img src="Img/Logo.png" width="90" height="80" id="LogoPng">
+                <div id="LogoTitle">Jap<span>Food</span></div>
+            </div>
+        </a>
+
+        <nav class="MainNav">
+            <a class="NavItem" id=ActivePage>Заказы</a>
+        </nav>
+    </header>
+
+    <section>
+
+        <form name="userForm">
+            <input type="hidden" name="id" value="0" />
+            <label>Дата:</label>
+            <input type="date" name="date"/>
+            <label>Клиент</label>
+            <input type="text" name="client"/>
+            <label>Статус:</label>
+            <select name="status">
+                <option value="Принят">Принят</option>
+                <option value="Приготовлен">Приготовлен</option>
+                <option value="Доставлен">Доставлен</option>
+            </select>
+            <label>Сумма</label>
+            <input type="number" name="sum" min="0" max="100001" /><br>
+            <label>Файл-описание:</label>
+            <input type="file" name="filedata" />
+
+            <div class="panel-body">
+                <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
+                <a id="reset" class="btn btn-sm btn-primary">Сбросить</a>
+            </div>
+        </form>
+
+        <table class="table table-condensed table-striped table-bordered" id="orderTable">
+            <tr>
+                <th onclick="sortTable(0)" style="cursor:pointer">Номер</th>
+                <th onclick="sortTable(1)" style="cursor:pointer">Дата заказа</th>
+                <th onclick="sortTable(2)" style="cursor:pointer">Клиент</th>
+                <th onclick="sortTable(3)" style="cursor:pointer">Статус</th>
+                <th onclick="sortTable(4)" style="cursor:pointer">Сумма</th>
+                <th>Описание</th>
+                <th></th>
+            </tr>
+        </table>
+    </section>
+
+    <footer>
+        <div class="CreateInfo">Created by Yaroslav</div>
+    </footer>
+    
+    <script>
+            async function GetOrders() {
+                const response = await fetch("/api/orders", {
+                    method: "GET",
+                    headers: { "Accept": "application/json" }
+                });
+                // если запрос прошел нормально
+                if (response.ok === true) {
+                    // получаем данные
+                    const orders = await response.json();
+                    let rows = document.querySelector("tbody"); 
+                    orders.forEach(order => {
+                        // добавляем полученные элементы в таблицу
+                        rows.append(row(order));
+                    });
+                }
+            }
+            // Получение одного пользователя
+            async function GetOrder(id) {
+                const response = await fetch("/api/orders/" + id, {
+                    method: "GET",
+                    headers: { "Accept": "application/json" }
+                });
+                if (response.ok === true) {
+                    const order = await response.json();
+                    const form = document.forms["userForm"];
+                    form.elements["id"].value = order.o_id;
+                    form.elements["client"].value = order.o_client;
+                    form.elements["status"].value = order.o_client;
+                    form.elements["sum"].value = order.o_sum;
+                }
+            }
+            // Добавление пользователя
+            async function CreateUser(userName, userAge) {
+      
+                const response = await fetch("api/users", {
+                    method: "POST",
+                    headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        name: userName,
+                        age: parseInt(userAge, 10)
+                    })
+                });
+                if (response.ok === true) {
+                    const user = await response.json();
+                    reset();
+                    document.querySelector("tbody").append(row(user));
+                }
+            }
+            // Изменение пользователя
+            async function EditUser(userId, userName, userAge) {
+                const response = await fetch("api/users", {
+                    method: "PUT",
+                    headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        id: userId,
+                        name: userName,
+                        age: parseInt(userAge, 10)
+                    })
+                });
+                if (response.ok === true) {
+                    const order = await response.json();
+                    reset();
+                    document.querySelector("tr[data-rowid='" + order.o_id + "']").replaceWith(row(order));
+                }
+            }
+            // Удаление пользователя
+            async function DeleteOrder(id) {
+                const response = await fetch("/api/orders/" + id, {
+                    method: "DELETE",
+                    headers: { "Accept": "application/json" }
+                });
+                if (response.ok === true) {
+                    const id = await response.json();
+                    document.querySelector("tr[data-rowid='" + id + "']").remove();
+                }
+            }
+      
+            // сброс формы
+            function reset() {
+                const form = document.forms["userForm"];
+                form.reset();
+                form.elements["id"].value = 0;
+            }
+
+            // создание строки для таблицы
+            function row(order) {
+                const tr = document.createElement("tr");
+                tr.setAttribute("data-rowid", order.o_id);
+      
+                const idTd = document.createElement("td");
+                idTd.append(order.o_id);
+                tr.append(idTd);
+      
+                const dateTd = document.createElement("td");    
+                const date = new Date(order.o_date).toLocaleDateString();
+                dateTd.append(date);
+                tr.append(dateTd);
+      
+                const clientTd = document.createElement("td");
+                clientTd.append(order.o_client);
+                tr.append(clientTd);
+
+                const statusTd = document.createElement("td");
+                statusTd.append(order.o_status);
+                tr.append(statusTd);
+
+                const sumTd = document.createElement("td");
+                sumTd.append(order.o_sum);
+                tr.append(sumTd);
+
+                if (order.o_file)
+                {
+                    const saveFileLink = document.createElement("a");
+                    saveFileLink.setAttribute("style", "cursor:pointer;padding:15px;");
+                    saveFileLink.append("Скачать файл");
+                    tr.append(saveFileLink);
+                }
+                else
+                {
+                    const empty = document.createElement("td");
+                    tr.append(empty);
+                }
+
+                const linksTd = document.createElement("td");
+
+                const editLink = document.createElement("a");
+                editLink.setAttribute("data-id", order.o_id);
+                editLink.setAttribute("style", "cursor:pointer;padding:15px;");
+                editLink.append("Изменить");
+                editLink.addEventListener("click", e => {   
+                    e.preventDefault();
+                    GetOrder(order.o_id);
+                });
+                linksTd.append(editLink);
+  
+               const removeLink = document.createElement("a");
+                removeLink.setAttribute("data-id", order.o_id);
+                removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
+                removeLink.append("Удалить");
+                removeLink.addEventListener("click", e => {
+                    e.preventDefault();
+                    DeleteOrder(order.o_id);
+                });
+  
+                linksTd.append(removeLink);
+                tr.appendChild(linksTd);                
+
+                return tr;
+            }
+
+            // сброс значений формы
+            document.getElementById("reset").click(function (e) {
+      
+                e.preventDefault();
+                reset();
+            })
+      
+            // отправка формы
+            document.forms["userForm"].addEventListener("submit", e => {
+                e.preventDefault();
+                const form = document.forms["userForm"];
+                const id = form.elements["id"].value;
+                const name = form.elements["name"].value;
+                const age = form.elements["age"].value;
+                if (id == 0)
+                    CreateUser(name, age);
+                else
+                    EditUser(id, name, age);
+            });
+      
+            // загрузка закзов
+            GetOrders();
+        </script>
+
+</body>
+</html>
