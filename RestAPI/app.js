@@ -1,14 +1,8 @@
 const express = require("express");
 const mysql = require("mysql2");
 
-const bodyParser = require("body-parser");
-
-const multer  = require("multer");
-const upload = multer({dest:"uploads"});
-
 const app = express();
 const jsonParser = express.json();
-const urlencodedParser = bodyParser.urlencoded({extended: false})
 
 const pool = mysql.createPool({
     connectionLimit: 5,
@@ -44,7 +38,7 @@ app.post("/api/orders", jsonParser, function (req, res){
     const o_status = req.body.status;
     const o_sum = req.body.sum;
 
-    pool.query("INSERT INTO jap_order.order (o_date, o_user, o_status, o_sum) VALUES (?,?,?,?)", 
+    pool.query("INSERT INTO jap_order.order (o_date, o_user, o_status, o_sum) VALUES (?,?,?,?,?)", 
                 [o_date, o_user, o_status, o_sum], function(err, data) {
         if(err) return res.sendStatus(404);
         res.send(data);

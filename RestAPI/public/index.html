@@ -38,8 +38,6 @@
             </select>
             <label>Сумма</label>
             <input type="number" name="sum" min="0" max="100001" /><br>
-            <label>Файл-описание:</label>
-            <input type="file" name="filedata" />
 
             <div class="panel-body">
                 <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
@@ -114,7 +112,8 @@
                 if (response.ok === true) {
                     const order = await response.json();
                     reset();
-                    document.querySelector("tbody").append(row(order));
+                    clear();
+                    GetOrders();
                 }
             }
             // Изменение пользователя
@@ -133,7 +132,7 @@
                 if (response.ok === true) {
                     const order = await response.json();
                     reset();
-                    document.querySelector("tr[data-rowid='" + id + "']").remove();
+                    clear();
                     GetOrders();
                 }
             }
@@ -154,6 +153,13 @@
                 const form = document.forms["userForm"];
                 form.reset();
                 form.elements["id"].value = 0;
+            }
+
+            function clear(){
+                var table = document.getElementById("orderTable");
+                while (table.rows.length != 1){
+                    table.deleteRow(1);
+                }
             }
 
             // создание строки для таблицы
@@ -181,19 +187,6 @@
                 const sumTd = document.createElement("td");
                 sumTd.append(order.o_sum);
                 tr.append(sumTd);
-
-                if (order.o_path)
-                {
-                    const saveFileLink = document.createElement("a");
-                    saveFileLink.setAttribute("style", "cursor:pointer;padding:15px;");
-                    saveFileLink.append("Скачать файл");
-                    tr.append(saveFileLink);
-                }
-                else
-                {
-                    const empty = document.createElement("td");
-                    tr.append(empty);
-                }
 
                 const linksTd = document.createElement("td");
 
@@ -248,6 +241,62 @@
       
             // загрузка закзов
             GetOrders();
+
+            function sortTable(n)
+                {
+                    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+                    table = document.getElementById("orderTable");
+                    switching = true;
+                    // Set the sorting direction to ascending:
+                    dir = "asc";
+                    /* Make a loop that will continue until
+                    no switching has been done: */
+                    while (switching) {
+                        // Start by saying: no switching is done:
+                        switching = false;
+                        rows = table.getElementsByTagName("TR");
+                        /* Loop through all table rows (except the
+                        first, which contains table headers): */
+                        for (i = 1; i < (rows.length - 1); i++) {
+                        // Start by saying there should be no switching:
+                        shouldSwitch = false;
+                        /* Get the two elements you want to compare,
+                        one from current row and one from the next: */
+                        x = rows[i].getElementsByTagName("TD")[n];
+                        y = rows[i + 1].getElementsByTagName("TD")[n];    
+                        /* Check if the two rows should switch place,
+                        based on the direction, asc or desc: */
+                        if (dir == "asc") 
+                        {
+                                if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                                // If so, mark as a switch and break the loop:
+                                shouldSwitch = true;
+                            }
+                        }
+                        else if (dir == "desc") 
+                        {
+
+                            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            // If so, mark as a switch and break the loop:
+                            shouldSwitch = true;
+                            }   
+                        }
+                        if (shouldSwitch) {
+                        /* If a switch has been marked, make the switch
+                        and mark that a switch has been done: */
+                        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                        switching = true;
+                        // Each time a switch is done, increase this count by 1:
+                        switchcount ++;
+                        } else {
+                            if (switchcount == 0 && dir == "asc") {
+                                dir = "desc";
+                                switching = true;
+                                }
+                            }
+                        }
+                    }
+                }
         </script>
 
 </body>
